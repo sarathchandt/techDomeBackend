@@ -5,7 +5,9 @@ import {
     signup,
     otpMail,
     about,
-    upload
+    upload,
+    fetchPost,
+    fetchOnePost
 } from '../controller/controller.js'
 
 import {chechAuth} from '../middleware/auth.js'
@@ -24,7 +26,9 @@ router.route('/otpMail')
 router.route('/about')
     .get(chechAuth, about)
 router.route('/upload')
-    .post(chechAuth,upload); 
-
-
+    .post(chechAuth,uploadFile.single("file"),upload);
+router.route('/fetchPost')
+    .get(chechAuth,fetchPost)
+router.route('/fetchOnePost')
+    .get(chechAuth,fetchOnePost)
 export default router
