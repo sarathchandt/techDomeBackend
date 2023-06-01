@@ -7,7 +7,11 @@ import {
     about,
     upload,
     fetchPost,
-    fetchOnePost
+    fetchOnePost,
+    update,
+    deletePost,
+    fetch10post,
+    fetchCurr
 } from '../controller/controller.js'
 
 import {chechAuth} from '../middleware/auth.js'
@@ -31,4 +35,14 @@ router.route('/fetchPost')
     .get(chechAuth,fetchPost)
 router.route('/fetchOnePost')
     .get(chechAuth,fetchOnePost)
+router.route('/update')
+    .patch(chechAuth,uploadFile.single("file"),update)
+router.route('/deletePost')
+    .delete(chechAuth,deletePost)
+router.route('/fetch10post')
+    .get(fetch10post)
+router.route('/fetchCurr')
+    .get(chechAuth, fetchCurr)
+
+
 export default router

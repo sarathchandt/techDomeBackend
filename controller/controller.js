@@ -3,6 +3,7 @@ import { sendOtpMessage, verifyOtp } from "../middleware/mail.js";
 import User from '../model/userModel.js'
 import Post from '../model/postModel.js'
 import bcrypt from 'bcrypt'
+import { deleteFile } from "./imageDel.js";
 
 export function isAuthenticated(req, res) {
     res.status(200).json({ isAuthenticated: true })
@@ -98,17 +99,17 @@ export async function upload(req, res) {
     try {
       
         let { heading, chapters } = req.body;
-        let { filename } = req.file;
+        let { filename , path} = req.file;
         new Post({
             image: filename,
             heading: heading,
             chapters: chapters,
-            user:res.locals.userId.id
+            user:res.locals.userId.id,
+            path:path
         }).save().then((resu) => {
-            console.log(resu);
             res.status(200).json({ posted: true })
         })
-    } catch (error) {
+    } catch (error) { 
         console.log(error);
         res.status(200).json({ posted: false })
     }
@@ -132,10 +133,61 @@ export async function fetchPost(req,res){
 export async function fetchOnePost(req, res){
     try {
         let post = await Post.findById(req.query.param1)
-        console.log(post);
         res.status(200).json({post:post})
     } catch (error) {
         res.status(500).json({post:false})
         
+    }
+}
+
+export async function update(req, res){
+    try {
+        let post = await Post.findById(req.body.id)
+        const {filename, path} = req.file;
+        const {chapters,heading} = req.body;
+           deleteFile(post.path);
+        await Post.updateOne({_id:post._id},{$set:{
+            image: filename,
+            heading: heading,
+            chapters: chapters,
+            user:res.locals.userId.id,
+            path:path
+        }}).then(()=>{
+            res.status(200).json({updated:true})
+        })
+    } catch (error) {
+        res.status(500).json({updated:false})
+    }
+}
+
+export async function deletePost(req, res){
+    try {
+        let post = await Post.findById(req.body.id)
+        deleteFile(post.path);
+        await Post.deleteOne({_id:req.body.id}).then(()=>{
+            res.status(200).json({deleted:true})
+        })
+    } catch (error) {
+        res.status(500).json({deleted:false})
+    }
+}
+
+export async function fetch10post(req, res){
+    try {
+        await Post.find().find().sort({ createdAt: -1 }).limit(10).then(result=>{
+            res.status(200).json({posts:result})
+        })
+    } catch (error) {
+        res.status(500).json({posts:false})
+    }
+}
+
+export async function fetchCurr(req, res){
+    try {
+        await Post.findById(req.query.param1).then(result=>{
+            res.status(200).json({post:result})
+        })
+    } catch (error) {
+        res.status(200).json({post:false})
     }
 }

@@ -18,6 +18,10 @@ const postSchema = new mongoose.Schema({
         type:mongoose.Types.ObjectId,
         require:true,   
         ref:"users"
+    },
+    path:{
+        type : String,
+        require:true
     }
 
 },{timestamps:true})
